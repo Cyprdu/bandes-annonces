@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Répertoire des Bandes Annonces</title>
     <style>
-
-
         .search-bar {
             margin: 20px auto;
             width: 80%;
@@ -22,7 +20,6 @@
             border: 2px solid #ddd;
             border-radius: 5px;
         }
-
 
         .popup {
             position: fixed;
@@ -69,7 +66,6 @@
         .movie-item.hidden {
             display: none;
         }
-
 
         body {
             font-family: Arial, sans-serif;
@@ -147,7 +143,19 @@
             width: 30px;
             height: 30px;
         }
+
+        /* Style pour les publicités */
+        .ads-container {
+            width: 100%;
+            margin: 20px 0;
+            text-align: center;
+        }
     </style>
+
+    <!-- Script pour AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3659884670016121"
+     crossorigin="anonymous"></script>
+
 </head>
 <body>
 
@@ -159,13 +167,29 @@
         <input type="text" id="search-input" placeholder="Rechercher un film..." oninput="filterMovies()">
     </div>
 
-    
     <div class="scroll-to-top" id="scrollToTop">
         <img src="https://cdn-icons-png.flaticon.com/512/959/959157.png" alt="Remonter">
     </div>
 
     <main>
+        <!-- Espace pour les publicités -->
+        <div class="ads-container">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-3659884670016121"
+                 data-ad-slot="5988111272"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+
         <div class="movie-list" id="movie-list">
+            <!-- Films ici -->
+
+
+            
             <div class="movie-item" data-title="" onclick="openPopup('https://medib.videofutur.fr/31212/350595881-10046480-1001069-ANORA-HD-BA.mp4')">
                 <div class="logo-container">
                     <img src="https://media.themoviedb.org/t/p/original/lI16CtyyyQCm1H6dMVvLxm0gtit.jpg" alt="Affiche du film">
@@ -2493,7 +2517,24 @@
                 <span>The Chosen</span>
             </div>
 
+
+
+
         </div>
+
+        <!-- Espace pour une autre publicité -->
+        <div class="ads-container">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-3659884670016121"
+                 data-ad-slot="5988111272"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+
     </main>
 
     <!-- Popup de lecture de la bande annonce -->
@@ -2502,7 +2543,6 @@
             <iframe id="video-player" width="560" height="315" frameborder="0" allowfullscreen></iframe>
             <div class="popup-buttons">
                 <button onclick="copyLink()">Copier le lien MP4</button>
-                <!-- Nouveau bouton pour ouvrir en plein écran -->
                 <a href="" id="fullscreen-link" class="button" target="_blank">Mettre en plein écran</a>
             </div>
         </div>
@@ -2510,18 +2550,16 @@
 
     <script>
         function openPopup(videoUrl) {
-            // Ouvrir la popup et charger le lecteur vidéo
             const popup = document.getElementById("video-popup");
             const videoPlayer = document.getElementById("video-player");
             const fullscreenLink = document.getElementById("fullscreen-link");
             
             popup.style.display = "flex";
             videoPlayer.src = videoUrl;
-            fullscreenLink.href = videoUrl; // Met à jour le lien pour ouvrir dans un nouvel onglet
+            fullscreenLink.href = videoUrl;
         }
 
         function closePopup() {
-            // Fermer la popup et stopper le lecteur vidéo
             const popup = document.getElementById("video-popup");
             const videoPlayer = document.getElementById("video-player");
             
@@ -2530,7 +2568,6 @@
         }
 
         function copyLink() {
-            // Copier le lien MP4 de la bande-annonce
             const videoUrl = document.getElementById("video-player").src;
             navigator.clipboard.writeText(videoUrl).then(() => {
                 alert("Le lien MP4 a été copié !");
@@ -2551,30 +2588,27 @@
             });
         }
 
-document.addEventListener("DOMContentLoaded", function () {
-    const movieItems = document.querySelectorAll('.movie-item');
-    
-    movieItems.forEach(item => {
-        // Extraire le texte du span et l'utiliser pour définir data-title
-        const movieTitle = item.querySelector('span').textContent.trim();
-        item.setAttribute('data-title', movieTitle);
-    });
-});
+        document.addEventListener("DOMContentLoaded", function () {
+            const movieItems = document.querySelectorAll('.movie-item');
+            
+            movieItems.forEach(item => {
+                const movieTitle = item.querySelector('span').textContent.trim();
+                item.setAttribute('data-title', movieTitle);
+            });
+        });
 
+        window.addEventListener("scroll", function () {
+            const scrollToTop = document.getElementById("scrollToTop");
+            if (window.scrollY > 300) {
+                scrollToTop.style.display = "flex";
+            } else {
+                scrollToTop.style.display = "none";
+            }
+        });
 
-window.addEventListener("scroll", function () {
-    const scrollToTop = document.getElementById("scrollToTop");
-    if (window.scrollY > 300) {
-        scrollToTop.style.display = "flex";
-    } else {
-        scrollToTop.style.display = "none";
-    }
-});
-
-document.getElementById("scrollToTop").addEventListener("click", function () {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-});
-
+        document.getElementById("scrollToTop").addEventListener("click", function () {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
 
     </script>
 </body>
