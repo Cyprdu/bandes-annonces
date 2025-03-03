@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Site de bandes annonces de films</title>
+    <title>Site de Bandes Annonces de Films</title>
     <style>
         /* Global Styles */
         body {
@@ -19,20 +19,41 @@
             margin: 20px 0;
         }
 
+        /* Search bar with fixed position and blur effect */
         .search-container {
-            text-align: center;
-            margin: 20px;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px); /* Apply blur effect */
+            padding: 10px 15px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            width: 250px;
+            z-index: 1000; /* Keep it above other elements */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
         }
 
         .search-bar {
+            flex-grow: 1;
             padding: 10px;
-            width: 300px;
             font-size: 16px;
             border: none;
-            border-radius: 25px;
             outline: none;
+            background-color: transparent; /* No background color */
+            color: white;
+            font-family: Arial, sans-serif;
         }
 
+        .search-icon {
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        /* Movie List Layout */
         .movie-list {
             display: flex;
             flex-wrap: wrap;
@@ -46,7 +67,7 @@
             text-align: center;
             cursor: pointer;
             transition: transform 0.3s ease;
-            width: 200px; /* Set a fixed width to ensure uniformity */
+            width: 200px;
         }
 
         .movie-item:hover {
@@ -67,6 +88,7 @@
             object-fit: cover;
         }
 
+        /* Popup Styles */
         .popup-overlay {
             display: none;
             position: fixed;
@@ -95,6 +117,7 @@
             border-radius: 10px;
         }
 
+        /* Button Styling */
         .popup-button {
             background-color: #d3b22c;
             border: none;
@@ -105,8 +128,8 @@
             margin: 10px;
             cursor: pointer;
             transition: background-color 0.3s;
-            width: calc(50% - 20px); /* Ensures buttons do not overflow */
-            max-width: 180px; /* Limits button size */
+            width: calc(50% - 20px);
+            max-width: 180px;
             text-align: center;
         }
 
@@ -114,12 +137,12 @@
             background-color: #c0961f;
         }
 
+        /* Ads Section */
         .adsense {
             text-align: center;
             margin: 20px 0;
         }
 
-        /* AdSense Styles */
         .adsbygoogle {
             display: inline-block;
             width: 360px;
@@ -131,10 +154,13 @@
 
     <h1>Bandes Annonces de Films</h1>
 
+    <!-- Search Bar fixed at the top-right with blur effect -->
     <div class="search-container">
-        <input class="search-bar" type="text" placeholder="Rechercher un film..." id="search-bar">
+        <input class="search-bar" type="text" placeholder="Rechercher un film..." id="search-bar" oninput="performSearch()">
+        <img class="search-icon" src="https://www.nicepng.com/png/full/399-3992892_jury-icone-moteur-de-recherche.png" alt="Search Icon">
     </div>
 
+    <!-- Movie List -->
     <div class="movie-list" id="movie-list">
         <div class="movie-item" data-title="" onclick="openPopup('https://medib.videofutur.fr/31212/350595881-10046480-1001069-ANORA-HD-BA.mp4')">
             <div class="logo-container">
@@ -2464,7 +2490,7 @@
         </div>
     </div>
 
-    <!-- Popup for video -->
+    <!-- Popup for Video -->
     <div class="popup-overlay" id="popup-overlay">
         <div class="popup-container">
             <video id="video-popup" controls></video>
@@ -2475,7 +2501,7 @@
         </div>
     </div>
 
-    <!-- Ads section -->
+    <!-- Adsense -->
     <div class="adsense">
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3659884670016121"
                 crossorigin="anonymous"></script>
@@ -2489,7 +2515,7 @@
     </div>
 
     <script>
-        // Open video popup
+        // Open the video popup with the link provided
         function openPopup(url) {
             var videoElement = document.getElementById("video-popup");
             var popupOverlay = document.getElementById("popup-overlay");
@@ -2505,7 +2531,7 @@
             }
         });
 
-        // Copy the video link to clipboard
+        // Copy the video URL to clipboard
         function copyLink() {
             var videoUrl = document.getElementById("video-popup").src;
             navigator.clipboard.writeText(videoUrl).then(function() {
@@ -2513,19 +2539,35 @@
             });
         }
 
-        // Toggle fullscreen mode for video
+        // Toggle fullscreen for the video
         function toggleFullscreen() {
             var videoElement = document.getElementById("video-popup");
             if (videoElement.requestFullscreen) {
                 videoElement.requestFullscreen();
             } else if (videoElement.mozRequestFullScreen) { // Firefox
                 videoElement.mozRequestFullScreen();
-            } else if (videoElement.webkitRequestFullscreen) { // Chrome, Safari and Opera
+            } else if (videoElement.webkitRequestFullscreen) { // Chrome, Safari, Opera
                 videoElement.webkitRequestFullscreen();
             } else if (videoElement.msRequestFullscreen) { // IE/Edge
                 videoElement.msRequestFullscreen();
             }
         }
+
+        // Perform search and filter the movie list based on the text inside the <span>
+        function performSearch() {
+            var searchQuery = document.getElementById("search-bar").value.toLowerCase();
+            var movieItems = document.querySelectorAll(".movie-item");
+
+            movieItems.forEach(function(item) {
+                var title = item.querySelector("span").textContent.toLowerCase();
+                if (title.includes(searchQuery)) {
+                    item.style.display = "block";
+                } else {
+                    item.style.display = "none";
+                }
+            });
+        }
     </script>
+
 </body>
 </html>
