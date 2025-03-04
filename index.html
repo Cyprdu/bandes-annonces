@@ -3649,6 +3649,33 @@
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+    async function loadMovies() {
+        const response = await fetch('/movies.json');
+        const movies = await response.json();
+        const movieGrid = document.getElementById("movieGrid");
+
+        movies.forEach(movie => {
+            const movieItem = document.createElement("div");
+            movieItem.classList.add("movie-item");
+            movieItem.setAttribute("onclick", `openPopup('${movie.trailer}')`);
+
+            movieItem.innerHTML = `
+                <div class="logo-container">
+                    <img src="${movie.poster}" alt="Affiche du film">
+                </div>
+                <span>${movie.name}</span>
+            `;
+
+            movieGrid.appendChild(movieItem);
+        });
+    }
+
+    window.onload = loadMovies;
+
+
+
+    
     </script>
 </body>
 </html>
