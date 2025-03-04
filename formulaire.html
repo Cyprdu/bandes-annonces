@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter un Film</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #10171F;
+            color: white;
+            text-align: center;
+        }
+        .form-container {
+            background: rgba(35, 47, 62, 0.9);
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            margin: 50px auto;
+            border-radius: 10px;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+        }
+        input {
+            background: #232F3E;
+            color: white;
+        }
+        button {
+            background: #F2941B;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Ajouter une Bande-Annonce</h2>
+        <input type="text" id="movieName" placeholder="Nom du film" required>
+        <input type="url" id="moviePoster" placeholder="Lien de l'affiche" required>
+        <input type="url" id="movieTrailer" placeholder="Lien du MP4" required>
+        <button onclick="addMovie()">Ajouter</button>
+    </div>
+
+    <script>
+        async function addMovie() {
+            const name = document.getElementById("movieName").value;
+            const poster = document.getElementById("moviePoster").value;
+            const trailer = document.getElementById("movieTrailer").value;
+
+            if (!name || !poster || !trailer) {
+                alert("Veuillez remplir tous les champs !");
+                return;
+            }
+
+            const newMovie = { name, poster, trailer };
+
+            await fetch('/.netlify/functions/add-movie', {
+                method: 'POST',
+                body: JSON.stringify(newMovie),
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            alert("Film ajouté avec succès !");
+            window.location.href = "index.html";
+        }
+    </script>
+
+</body>
+</html>
