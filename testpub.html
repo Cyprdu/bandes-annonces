@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>CinéStream</title>
+  <link rel="icon" href="https://github.com/Cyprdu/projection/blob/main/CIN%C3%A9%20(1).png?raw=true" type="image/png">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background-color: #00050d; /* Arrière-plan de la page */
+    }
+
+    #container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    iframe {
+      width: 99.9%;
+      height: 99.9%;
+      border: none;
+    }
+
+    /* Style pour le conteneur des pubs */
+    #ads-container {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      text-align: center;
+      padding: 10px 0;
+      background-color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <iframe id="myFrame" src="https://cinestream2025.netlify.app/test2"></iframe>
+  </div>
+
+  <!-- Conteneur des publicités -->
+  <div id="ads-container">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3659884670016121"
+        crossorigin="anonymous"></script>
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-3659884670016121"
+         data-ad-slot="YOUR_AD_SLOT_ID"
+         data-ad-format="auto"></ins>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <script>
+    function forceReflow() {
+      const frame = document.getElementById('myFrame');
+      // Redimensionner légèrement puis restaurer pour forcer le reflow
+      const originalHeight = frame.style.height;
+      frame.style.height = '99.9%';
+      setTimeout(() => {
+        frame.style.height = originalHeight || '100%';
+      }, 50);
+    }
+
+    window.addEventListener('resize', forceReflow);
+    document.addEventListener('fullscreenchange', forceReflow);
+  </script>
+</body>
+</html>
