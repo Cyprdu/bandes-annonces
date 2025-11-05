@@ -1,77 +1,2381 @@
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>CinéStream</title>
-  <link rel="icon" href="https://github.com/Cyprdu/projection/blob/main/CIN%C3%A9%20(1).png?raw=true" type="image/png">
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
-      background-color: #00050d; /* Arrière-plan de la page */
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinéStream - Votre plateforme de streaming</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        :root {
+            --primary-bg: #00050d;
+            --secondary-bg: #0a1428;
+            --accent-color: #3b82f6;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+        }
+        .large-screen .my-container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: auto;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+        .navbar {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background-color: rgba(0, 5, 13, 0.7);
+            transition: all 0.3s ease;
+        }
+        .navbar-scrolled {
+            background-color: rgba(0, 5, 13, 0.9);
+        }
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+        .nav-link.active::after,
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .hero-slider {
+            height: 80vh;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease;
+            background-size: cover;
+            background-position: center;
+        }
+        .hero-slide.active {
+            opacity: 1;
+        }
+        .hero-overlay {
+            background: linear-gradient(to top, #000307 10%, transparent 100%, #00050d 100%);
+            pointer-events: none;
+        }
+        .poster-card {
+            transition: all 0.3s ease;
+            transform-origin: center bottom;
+            pointer-events: auto;
+        }
+        .poster-card:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        .poster-info {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        .poster-card:hover .poster-info {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        .recommendation-poster {
+            width: 160px;
+            height: 240px;
+            margin: 10px;
+        }
+        .recommendation-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .section-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            width: 60px;
+            height: 3px;
+            background-color: var(--accent-color);
+        }
+        .row-container {
+            position: relative;
+            margin-bottom: 50px;
+        }
+        .scroll-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(10, 20, 40, 0.8);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .scroll-btn.left {
+            left: 10px;
+        }
+        .scroll-btn.right {
+            right: 10px;
+        }
+        .movie-row {
+            display: flex;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 20px 0;
+            scrollbar-width: none;
+            position: relative;
+        }
+        .movie-row::-webkit-scrollbar {
+            display: none;
+        }
+        .progress-bar {
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+        }
+        .video-player-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            z-index: 1000;
+            display: none;
+        }
+        #player-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        #player {
+            width: 100%;
+            height: 100%;
+        }
+        #movie-title {
+            position: absolute;
+            top: 20px;
+            left: 80px;
+            background-color: rgba(0, 0, 0, 0);
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 1001;
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            color: rgba(255, 255, 255, 0);
+            font-size: 18px;
+        }
+        #back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            z-index: 1001;
+            color: white;
+            font-size: 24px;
+        }
+        .search-container {
+            overflow: hidden;
+            transition: width 0.3s ease;
+            width: 40px;
+        }
+        .search-container.active {
+            width: 250px;
+        }
+        .search-input {
+            width: 0;
+            padding: 0;
+            border: none;
+            background: transparent;
+            color: white;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        .search-container.active .search-input {
+            width: 200px;
+            padding: 0 10px;
+        }
+        .detail-page {
+            min-height: 100vh;
+            display: none;
+        }
+        .detail-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.3;
+            z-index: 0;
+        }
+        .detail-content {
+            position: relative;
+            z-index: 1;
+            padding-top: 30vh;
+        }
+        .detail-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 0%, var(--primary-bg) 70%);
+            z-index: 0;
+        }
+        .catalog-page {
+            min-height: 100vh;
+            padding-top: 80px;
+            display: none;
+        }
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .cast-container {
+            position: relative;
+            overflow: hidden;
+        }
+        .cast-scroll-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(10, 20, 40, 0.8);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+        }
+        .cast-scroll-btn.left {
+            left: 0;
+        }
+        .cast-scroll-btn.right {
+            right: 0;
+        }
+        .episode-item {
+            transition: all 0.2s ease;
+        }
+        .episode-item:hover {
+            background-color: rgba(59, 130, 246, 0.2);
+        }
+        .search-results {
+            display: none;
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+        .loading-spinner {
+            width: 300px;
+            height: 300px;
+            background-image: url('https://github.com/Cyprdu/projection/blob/main/CINÉ.png?raw=true');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        /* Réduire les affiches dans les sections spécifiques */
+        .reduce-poster-size .movie-row .poster-card {
+            min-width: 180px;
+            width: 180px;
+            margin: 0 5px;
+        }
+        .reduce-poster-size .poster-card img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+        /* Style pour le logo du film dans le slider */
+        .hero-logo {
+            max-width: 300px;
+            max-height: 100px;
+            margin-bottom: 20px;
+        }
+        /* Scrollbar design moderne */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(8px);
+            border-radius: 10px;
+            border: 2px solid rgba(0, 0, 0, 0.2);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        /* Style pour la croix de fermeture */
+        .close-detail {
+    position: fixed;
+    top: 80px;
+    left: 20px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    color: white;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(10, 20, 40, 0.5);
+    border-radius: 50%;
+    backdrop-filter: blur(5px);
+    margin-top: 5px;
+    z-index: 999; /* Changez cette valeur pour qu'elle soit inférieure à celle du lecteur */
+}
+        /* Taille adaptée pour le logo sur la page de détail */
+/* Taille adaptée pour le logo sur la page de détail */
+#detail-logo {
+    max-height: 100px;
+    max-width: 60%;
+    object-fit: contain;
+    margin-bottom: 15px;
+    display: none; /* <-- important : caché par défaut */
+}
 
-    #container {
-      width: 100%;
-      height: 100%;
-      position: relative;
-    }
 
-    iframe {
-      width: 99.9%;
-      height: 99.9%;
-      border: none;
-    }
-
-    /* Style pour le conteneur des pubs */
-    #ads-container {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      text-align: center;
-      padding: 10px 0;
-      background-color: #000;
-    }
-  </style>
+    </style>
 </head>
 <body>
-  <div id="container">
-    <iframe id="myFrame" src="test2"></iframe>
-  </div>
+    <!-- Navigation Bar -->
+    <nav class="navbar fixed top-0 left-0 w-full z-50 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center">
+            <a href="#" id="home-link" class="text-2xl font-bold text-white mr-10">CinéStream</a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#" class="nav-link active text-white" data-page="home">Accueil</a>
+                <a href="#" class="nav-link text-gray-300 hover:text-white" data-page="movies">Films</a>
+                <a href="#" class="nav-link text-gray-300 hover:text-white" data-page="series">Séries</a>
+                <a href="#" class="nav-link text-gray-300 hover:text-white" data-page="favorites">Mes Favories</a>
+            </div>
+        </div>
+        <div class="search-container flex items-center bg-gray-800 bg-opacity-50 rounded-full px-3 py-2">
+            <input type="text" class="search-input" placeholder="Rechercher...">
+            <button class="search-toggle text-gray-300 hover:text-white focus:outline-none">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </nav>
+    <!-- Home Page -->
+    <div id="home-page" class="page">
+        <!-- Hero Slider -->
+        <div class="hero-slider">
+            <!-- Slides will be dynamically added here -->
+            <div class="hero-overlay absolute inset-0 z-10"></div>
+        </div>
+        <!-- Content Sections -->
+        <div class="container mx-auto px-6 mt-[-120px] relative z-20">
+            <!-- Continue Watching Section -->
+            <section class="mb-12 reduce-poster-size">
+                <h2 class="section-title text-2xl font-bold">Reprendre la lecture</h2>
+                <div class="row-container">
+                    <button class="scroll-btn left"><i class="fas fa-chevron-left"></i></button>
+                    <div class="movie-row continue-watching-row">
+                        <!-- Continue watching items will be added here -->
+                    </div>
+                    <button class="scroll-btn right"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </section>
 
-  <!-- Conteneur des publicités -->
-  <div id="ads-container">
-    <!-- Script Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3659884670016121"
-        crossorigin="anonymous"></script>
-    <!-- Espace publicitaire -->
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-3659884670016121"
-         data-ad-slot="5988111272"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
+            
+            <!-- Tendances Section -->
+            <section class="mb-12 reduce-poster-size">
+                <h2 class="section-title text-2xl font-bold">Tendances</h2>
+                <div class="row-container">
+                    <button class="scroll-btn left"><i class="fas fa-chevron-left"></i></button>
+                    <div class="movie-row tend-movies-row">
+                        <!-- Tend movies will be added here -->
+                    </div>
+                    <button class="scroll-btn right"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </section>
+
+            <!-- Ça explose à l’écran Section -->
+            <section class="mb-12 reduce-poster-size">
+                <h2 class="section-title text-2xl font-bold">Ça explose à l’écran</h2>
+                <div class="row-container">
+                    <button class="scroll-btn left"><i class="fas fa-chevron-left"></i></button>
+                    <div class="movie-row action-movies-row">
+                        <!-- Action movies will be added here -->
+                    </div>
+                    <button class="scroll-btn right"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </section>
+
+                        <!-- Popular Series Section -->
+            <section class="mb-12 reduce-poster-size">
+                <h2 class="section-title text-2xl font-bold">Séries populaires</h2>
+                <div class="row-container">
+                    <button class="scroll-btn left"><i class="fas fa-chevron-left"></i></button>
+                    <div class="movie-row series-row">
+                        <!-- Series will be added here -->
+                    </div>
+                    <button class="scroll-btn right"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </section>
+
+            
+                                    <!-- TV -->
+            <section class="mb-12 reduce-poster-size">
+                <h2 class="section-title text-2xl font-bold">Regardez la TV en direct</h2>
+                <div class="row-container">
+                    <button class="scroll-btn left"><i class="fas fa-chevron-left"></i></button>
+                    <div class="movie-row TV-row">
+                        <!-- TV will be added here -->
+                    </div>
+                    <button class="scroll-btn right"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </section>
+
+            
+            
+
+                                    <!-- Marvel -->
+            <section class="mb-12 reduce-poster-size">
+                <h2 class="section-title text-2xl font-bold">Chronologie de l'univers Marvel </h2>
+                <div class="row-container">
+                    <button class="scroll-btn left"><i class="fas fa-chevron-left"></i></button>
+                    <div class="movie-row Marvel-row">
+                        <!-- Chronologie de l'univers Marvel will be added here -->
+                    </div>
+                    <button class="scroll-btn right"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </section>
+
+                        <!-- Sagas Section -->
+            <section class="mb-12 reduce-poster-size">
+                <h2 class="section-title text-2xl font-bold">Sagas</h2>
+                <div class="row-container">
+                    <button class="scroll-btn left"><i class="fas fa-chevron-left"></i></button>
+                    <div class="movie-row sagas-row">
+                        <!-- Sagas will be added here -->
+                    </div>
+                    <button class="scroll-btn right"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </section>
+
+
+            <!-- Ce monde part en vrille Section -->
+            <section class="mb-12 reduce-poster-size">
+                <h2 class="section-title text-2xl font-bold">Ce monde part en vrille</h2>
+                <div class="row-container">
+                    <button class="scroll-btn left"><i class="fas fa-chevron-left"></i></button>
+                    <div class="movie-row Cath1Movies-row">
+                        <!-- Ce monde part en vrille will be added here -->
+                    </div>
+                    <button class="scroll-btn right"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </section>
+
+            
+
+                        <!-- Harry Potter -->
+            <section class="mb-12 reduce-poster-size">
+                <h2 class="section-title text-2xl font-bold">Univers Harry Potter</h2>
+                <div class="row-container">
+                    <button class="scroll-btn left"><i class="fas fa-chevron-left"></i></button>
+                    <div class="movie-row HarryPotter-row">
+                        <!-- Harry Potter will be added here -->
+                    </div>
+                    <button class="scroll-btn right"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </section>
+
+
+
+
+            
+            <!-- Films Français Section -->
+            <section class="mb-12 reduce-poster-size">
+                <h2 class="section-title text-2xl font-bold">Films Français</h2>
+                <div class="row-container">
+                    <button class="scroll-btn left"><i class="fas fa-chevron-left"></i></button>
+                    <div class="movie-row FR-movies-row">
+                        <!-- Films Français will be added here -->
+                    </div>
+                    <button class="scroll-btn right"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </section>
+
+            
+                    <!-- Films Cimique Section -->
+            <section class="mb-12 reduce-poster-size">
+                <h2 class="section-title text-2xl font-bold">C'est drôle, non ?</h2>
+                <div class="row-container">
+                    <button class="scroll-btn left"><i class="fas fa-chevron-left"></i></button>
+                    <div class="movie-row Drole-row">
+                        <!-- Films Français will be added here -->
+                    </div>
+                    <button class="scroll-btn right"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </section>
+
+
+
+            
+
+
+
+                        <!-- Amor Section -->
+            <section class="mb-12 reduce-poster-size">
+                <h2 class="section-title text-2xl font-bold">Viens, on tombe amoureux</h2>
+                <div class="row-container">
+                    <button class="scroll-btn left"><i class="fas fa-chevron-left"></i></button>
+                    <div class="movie-row AmorMovies-row">
+                        <!-- Sagas will be added here -->
+                    </div>
+                    <button class="scroll-btn right"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </section>
+
+            
+
+
+        </div>
+    </div>
+    <div style="margin-bottom: 10px;"></div>
+    <!-- Movies Catalog Page -->
+<div id="movies-page" class="catalog-page">
+    <div class="container mx-auto px-6">
+        <h1 class="text-3xl font-bold mb-8">Films</h1>
+        <h2 class="section-title text-2xl font-bold">Tous les films</h2>
+        <div class="catalog-grid alls-movies-grid">
+            <!-- All movies will be added here -->
+        </div>
+    </div>
+</div>
+    <!-- Series Catalog Page -->
+    <div id="series-page" class="catalog-page">
+        <div class="container mx-auto px-6">
+            <h1 class="text-3xl font-bold mb-8">Séries</h1>
+            <h2 class="section-title text-2xl font-bold">Tendances</h2>
+            <div class="catalog-grid trending-series-grid mb-12">
+                <!-- Trending series will be added here -->
+            </div>
+            <h2 class="section-title text-2xl font-bold">Toutes les séries</h2>
+            <div class="catalog-grid all-series-grid">
+                <!-- All series will be added here -->
+            </div>
+        </div>
+    </div>
+    <!-- Favorites Page -->
+    <div id="favorites-page" class="catalog-page">
+        <div class="container mx-auto px-6">
+            <h1 class="text-3xl font-bold mb-8">Mes Favories</h1>
+            <div class="catalog-grid favorites-grid">
+                <!-- Favorites will be added here -->
+            </div>
+        </div>
+    </div>
+    <!-- Saga Catalog Page -->
+    <div id="saga-page" class="catalog-page">
+        <div class="container mx-auto px-6">
+            <h1 class="text-3xl font-bold mb-8">Saga</h1>
+            <h2 class="section-title text-2xl font-bold">Films de la saga</h2>
+            <div class="catalog-grid saga-movies-grid">
+                <!-- Saga movies will be added here -->
+            </div>
+        </div>
+    </div>
+    <!-- Detail Page -->
+    <div id="detail-page" class="detail-page">
+        <div class="detail-backdrop"></div>
+        <div class="detail-gradient"></div>
+        <div class="container mx-auto px-6 detail-content mb-[100px]">
+            <div class="flex flex-col md:flex-row gap-8">
+                <div class="md:w-1/3">
+                    <img id="detail-poster" src="" alt="Poster" class="rounded-lg shadow-lg w-full">
+                </div>
+                <div class="md:w-2/3">
+                    <img id="detail-logo" src="" alt="Logo" class="h-24 mb-4 hidden">
+                    <h1 id="detail-title" class="text-4xl font-bold mb-2"></h1>
+                    <div class="flex items-center gap-4 mb-4 text-gray-300">
+                        <span id="detail-year"></span>
+                        <span id="detail-runtime"></span>
+                        <span id="detail-rating"></span>
+                    </div>
+                    <div class="flex gap-3 mb-6">
+                        <button id="play-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md flex items-center gap-2">
+                            <i class="fas fa-play"></i> Lire
+                        </button>
+                        <button id="trailer-btn" class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-md flex items-center gap-2">
+                            <i class="fas fa-film"></i> Bande annonce
+                        </button>
+                        <button id="favorite-btn" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-md">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold mb-2">Synopsis</h2>
+                        <p id="detail-overview" class="text-gray-300"></p>
+                    </div>
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold mb-2">Genres</h2>
+                        <div id="detail-genres" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Same Saga Section -->
+            <div id="same-saga-section" class="mt-12 hidden">
+                <h2 class="text-2xl font-bold mb-4">De la même saga</h2>
+                <div id="same-saga-list" class="flex flex-wrap gap-4">
+                    <!-- Same saga movies will be added here -->
+                </div>
+            </div>
+            <!-- Episodes section (for series) -->
+            <div id="episodes-section" class="mt-12 hidden">
+                <h2 class="text-2xl font-bold mb-4">Épisodes</h2>
+                <div class="flex gap-4 mb-6">
+                    <select id="season-select" class="bg-gray-800 text-white px-4 py-2 rounded-md">
+                        <!-- Season options will be added here -->
+                    </select>
+                </div>
+                <div id="episodes-list">
+                    <!-- Episodes will be added here -->
+                </div>
+            </div>
+        </div>
+        <div id="close-detail" class="close-detail">
+            <i class="fas fa-times"></i>
+        </div>
+    </div>
+    <!-- Search Results Page -->
+    <div id="search-results" class="search-results">
+        <div class="container mx-auto px-6">
+            <h1 class="text-3xl font-bold mb-8">Résultats de recherche</h1>
+            <div class="catalog-grid search-results-grid">
+                <!-- Search results will be added here -->
+            </div>
+        </div>
+    </div>
+    <!-- Video Player -->
+    <div class="video-player-container">
+        <div id="player-container">
+            <a href="javascript:void(0)" id="back-link">
+                <div id="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+            </a>
+            <div id="movie-title"></div>
+            <div id="player"></div>
+        </div>
+    </div>
+<div id="loading" class="hidden"></div>
+
+    </div>
+    <script src="https://projection-2025.netlify.app/playerjs.js"></script>
     <script>
-      // Initialisation des publicités
-      (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-  </div>
+        // API Configuration
+        const API_KEY = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmMGZiMzE0MWEyOWQ1MTY1NGU5Y2ZkOWM5MGYxNjI2NyIsIm5iZiI6MTcyMTQ4MTMzNS45NjMsInN1YiI6IjY2OWJiODc3MTc0OTgzOWJmODhlYWM2OCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.WU6WYxkzGVxHJJQpUJ2xt3lyyB9hCXBbesUN3WTN-V0';
+        const BASE_URL = 'https://api.themoviedb.org/3';
+        const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/';
 
-  <script>
-    function forceReflow() {
-      const frame = document.getElementById('myFrame');
-      // Redimensionner légèrement puis restaurer pour forcer le reflow
-      const originalHeight = frame.style.height;
-      frame.style.height = '99.9%';
-      setTimeout(() => {
-        frame.style.height = originalHeight || '100%';
-      }, 50);
+        // Lists for specific sections
+        const TendMovies = [
+            { id: 1156594 },
+            { id: 1272166 },
+            { id: 604079 },
+            { id: 76600 },
+            { id: 997113 },
+            { id: 617126 },
+            { id: 911430 },
+            { id: 157336 },
+            { id: 76600 },
+            { id: 575265 },
+            { id: 1054867 },
+            { id: 1071585 },
+            { id: 13448 },
+            
+        ];
+
+        const actionMovies = [
+            { id: 24428 },
+            { id: 76600 },
+            { id: 299536 },
+            { id: 27205 },
+            { id: 19995 },
+            { id: 49521 },
+            { id: 99861 },
+            { id: 912649 },
+            { id: 634649 },     
+            { id: 140607 },
+            { id: 823464 },
+            { id: 786892 },
+        ];
+
+        
+        const Marvel = [
+            { id: 1771 },
+            { id: 299537 },
+            { id: 1726 },
+            { id: 10138 },
+            { id: 10195 },
+            { id: 1724 },
+            { id: 24428 },
+            { id: 76338 },
+            { id: 68721 },
+            { id: 1771 },
+            { id: 100402 },
+            { id: 118340 },
+            { id: 283995 },
+            { id: 99861 },
+            { id: 102899 },
+            { id: 271110 },
+            { id: 284054 },
+            { id: 497698 },
+            { id: 315635 },
+            { id: 284052 },
+            { id: 284053 },
+            { id: 363088 },
+            { id: 299536 },
+            { id: 299534 },
+            { id: 429617 },
+            { id: 634649 },
+            { id: 1571550 },
+            { id: 524434 },
+            { id: 566525 },
+        ];
+
+
+
+        
+
+                        const popularCollections = [
+                    { id: 87359, name: "Mission: Impossible" },
+                    { id: 10, name: "Star Wars" },
+                    { id: 86311, name: "Avengers" },
+                    { id: 1241, name: "Harry Potter" },
+                    { id: 531241, name: "Spider-Man" },
+                    { id: 119, name: "Le Seigneur des Anneaux" },
+                    { id: 121938, name: "Le Hobbit" },
+                    { id: 131635, name: "Hunger Games" },
+                    { id: 295130, name: "X-Men" },
+                    { id: 420, name: "Le Monde de Narnia" },
+                    { id: 488924, name: "Paddington" },
+                ];
+
+        
+
+        
+        const popularSeries = [
+            { id: 119051 },
+            { id: 80752 },
+            { id: 122781 },
+            { id: 96677 },
+            { id: 84958 },
+            { id: 93405 },
+            { id: 112738 },
+            { id: 1399 },
+            { id: 1416 },
+            { id: 71446 },
+            { id: 1396 },
+            { id: 48866 },
+            { id: 1402 },
+            { id: 82856 },
+            { id: 202772 },
+            { id: 114410 },
+            { id: 205715 },
+            { id: 124364 },
+            { id: 46952 },
+            { id: 1412 },
+            { id: 92749 },
+            { id: 63210 },
+            { id: 122228 },
+            { id: 136673 },  
+        ];
+
+
+                const HarryPotter = [
+            { id: 671 },
+            { id: 672 },
+            { id: 673 },
+            { id: 674 },
+            { id: 675 },
+            { id: 767 },
+            { id: 12444 },
+            { id: 12445 },
+            { id: 899082 },
+            { id: 259316 },
+            { id: 338952 },
+            { id: 338953 },
+            { id: 80530 },
+                    
+        ];
+
+            const Drole = [
+            { id: 865498 },
+            { id: 1152014 },
+            { id: 963116 },
+            { id: 810389 },
+            { id: 15449 },
+            { id: 2899 },
+            { id: 1235619 },
+            { id: 519182 },
+            { id: 613377 },
+            { id: 982186 },
+            { id: 262551 },
+            { id: 331836 },
+            { id: 398929 },
+            { id: 432613 },
+            { id: 68637 },
+            { id: 103327 },
+            { id: 605733 },
+            { id: 811886 },
+            { id: 605015 },
+            { id: 1000866 },
+            { id: 1118841 },
+                
+                    
+        ];
+
+
+
+
+         const Cath1Movies = [
+            { id: 157336 },
+            { id: 299536 },
+            { id: 438631 },
+            { id: 575265 },
+            { id: 348 },
+            { id: 11 },
+            { id: 679 },
+            { id: 70981 },
+            { id: 286217 },     
+            { id: 283995 },
+            { id: 675 },
+            { id: 285 },
+            { id: 1930 },
+            { id: 70160 },
+            { id: 37724 },
+            { id: 329865 },
+              
+        ];
+
+
+        
+  const FRMovies = [
+     { id: 1152014 },
+     { id: 1084736 },
+     { id: 1100474 },
+     { id: 2899 },
+     { id: 77338 },   
+     { id: 398929 },
+     { id: 516729 },
+     { id: 1000866 },
+     { id: 1002155 },
+     { id: 959604 },
+     { id: 1039512 },
+     { id: 936074 }, 
+     { id: 811596 },
+     { id: 5528 },
+      { id: 15449 },
+    { id: 973912 },
+     { id: 11687 },
+     { id: 613335 }, 
+     { id: 736500 },
+     { id: 21778 },
+      { id: 589984 },
+    { id: 760 },
+     { id: 382597 },
+       { id: 182219 },
+     { id: 344268 },
+     { id: 6691 }, 
+     { id: 68637 },
+     { id: 12716 },
+      { id: 2330 },
+    { id: 8290 },
+     { id: 398924 },
+     { id: 102207 }, 
+     { id: 80015 },
+
+      
+];
+       
+   
+             const AmorMovies = [
+            { id: 13 },
+            { id: 597 },
+            { id: 152601 },
+            { id: 313369 },
+            { id: 1084736 },
+            { id: 38 },
+            { id: 453 },
+            { id: 398818 },
+            { id: 4922 },     
+            { id: 959604 },
+            { id: 6691 },
+            { id: 1930 },
+            { id: 11224 },
+            { id: 421447 },
+      
+        ];  
+
+            const TV = [
+            { id: 1572246 },
+            { id: 1572344 },
+            { id: 1572495 },
+            { id: 1572496 },
+            { id: 1572503 },
+            { id: 1572500 },
+            { id: 1572505 },
+            { id: 1572508 },
+            { id: 1572509 },
+            { id: 1572511 },
+            { id: 1572512 },
+            { id: 1572527 },
+            { id: 1572522 },
+            { id: 1572524 },
+            { id: 1572526 },
+            { id: 1572527 },
+            { id: 1572528 },
+            { id: 1572350 },
+            { id: 1572632 },
+            { id: 1572634 },
+            { id: 1572635 },
+            { id: 1572636 },     
+        ];
+        
+
+
+        // DOM Elements
+        const pages = {
+            home: document.getElementById('home-page'),
+            movies: document.getElementById('movies-page'),
+            series: document.getElementById('series-page'),
+            favorites: document.getElementById('favorites-page'),
+            saga: document.getElementById('saga-page'),
+            detail: document.getElementById('detail-page'),
+            search: document.getElementById('search-results')
+        };
+        const navLinks = document.querySelectorAll('.nav-link');
+        const searchContainer = document.querySelector('.search-container');
+        const searchToggle = document.querySelector('.search-toggle');
+        const searchInput = document.querySelector('.search-input');
+        const videoPlayerContainer = document.querySelector('.video-player-container');
+        const backLink = document.getElementById('back-link');
+        const movieTitle = document.getElementById('movie-title');
+        const loading = document.getElementById('loading');
+        const homeLink = document.getElementById('home-link');
+        const closeDetail = document.getElementById('close-detail');
+
+        // State Management
+        let currentPage = 'home';
+        let currentMediaType = null;
+        let currentMediaId = null;
+        let currentSeason = null;
+        let currentEpisode = null;
+        let player = null;
+        let heroSliderInterval = null;
+        let availableContent = [];
+
+        // Function to fetch available content
+        async function fetchAvailableContent() {
+            try {
+                const response = await fetch('films.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Erreur lors de la récupération des données:', error);
+                return [];
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', async () => {
+            availableContent = await fetchAvailableContent();
+            initNavigation();
+            initSearchFunctionality();
+            initVideoPlayer();
+            loadHomePage();
+        });
+
+        // Navigation Functions
+        function initNavigation() {
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const page = link.dataset.page;
+                    navigateToPage(page);
+                });
+            });
+            homeLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                navigateToPage('home');
+            });
+
+            window.addEventListener('scroll', () => {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('navbar-scrolled');
+                } else {
+                    navbar.classList.remove('navbar-scrolled');
+                }
+            });
+
+            document.querySelectorAll('.row-container').forEach(container => {
+                const leftBtn = container.querySelector('.scroll-btn.left');
+                const rightBtn = container.querySelector('.scroll-btn.right');
+                container.addEventListener('mouseenter', () => {
+                    leftBtn.style.opacity = '1';
+                    rightBtn.style.opacity = '1';
+                });
+                container.addEventListener('mouseleave', () => {
+                    leftBtn.style.opacity = '0';
+                    rightBtn.style.opacity = '0';
+                });
+                leftBtn.addEventListener('click', () => {
+                    const row = container.querySelector('.movie-row');
+                    row.scrollBy({ left: -window.innerWidth * 0.75, behavior: 'smooth' });
+                });
+                rightBtn.addEventListener('click', () => {
+                    const row = container.querySelector('.movie-row');
+                    row.scrollBy({ left: window.innerWidth * 0.75, behavior: 'smooth' });
+                });
+            });
+
+            document.querySelectorAll('.cast-scroll-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const direction = btn.classList.contains('left') ? -1 : 1;
+                    const castContainer = document.getElementById('detail-cast');
+                    castContainer.scrollBy({ left: direction * 300, behavior: 'smooth' });
+                });
+            });
+
+            closeDetail.addEventListener('click', () => {
+                navigateToPage(currentPage);
+            });
+        }
+
+        function navigateToPage(page) {
+            Object.values(pages).forEach(p => {
+                p.style.display = 'none';
+            });
+
+            navLinks.forEach(link => {
+                if (link.dataset.page === page) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+
+            currentPage = page;
+            pages[page].style.display = 'block';
+
+            switch (page) {
+                case 'home':
+                    loadHomePage();
+                    break;
+                case 'movies':
+                    loadMoviesPage();
+                    break;
+                case 'series':
+                    loadSeriesPage();
+                    break;
+                case 'favorites':
+                    loadFavoritesPage();
+                    break;
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Search Functionality
+        function initSearchFunctionality() {
+            searchToggle.addEventListener('click', () => {
+                searchContainer.classList.toggle('active');
+                if (searchContainer.classList.contains('active')) {
+                    searchInput.focus();
+                }
+            });
+
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const query = searchInput.value.trim();
+                    if (query) {
+                        performSearch(query);
+                    }
+                }
+            });
+        }
+
+        async function performSearch(query) {
+            showLoading();
+            try {
+                const response = await fetchFromTMDB(`/search/multi?query=${encodeURIComponent(query)}&language=fr-FR`);
+                const results = response.results.filter(item =>
+                    (item.media_type === 'movie' || item.media_type === 'tv') &&
+                    item.poster_path &&
+                    isContentAvailable(item.media_type, item.id)
+                );
+
+                const resultsGrid = document.querySelector('.search-results-grid');
+                resultsGrid.innerHTML = '';
+
+                if (results.length === 0) {
+                    resultsGrid.innerHTML = '<p class="col-span-full text-center text-gray-400 py-12">Aucun résultat trouvé</p>';
+                } else {
+                    results.forEach(item => {
+                        resultsGrid.appendChild(createPosterCard(item, item.media_type));
+                    });
+                }
+
+                Object.values(pages).forEach(p => {
+                    p.style.display = 'none';
+                });
+                pages.search.style.display = 'block';
+            } catch (error) {
+                console.error('Search error:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Video Player Functions
+        function initVideoPlayer() {
+            backLink.addEventListener('click', closeVideoPlayer);
+        }
+
+        function openVideoPlayer(url, title, ageRating = '', posterUrl = '') {
+            videoPlayerContainer.style.display = 'block';
+            const displayTitle = ageRating ? `${title} (${ageRating})` : title;
+            movieTitle.textContent = displayTitle;
+            document.title = displayTitle;
+
+            const progress = getProgress(currentMediaType, currentMediaId);
+            let startTime = 0;
+            if (progress) {
+                startTime = progress.currentTime;
+            }
+
+            if (currentMediaType === 'movie') {
+                player = new Playerjs({
+                    id: "player",
+                    file: url,
+                    poster: "https://github.com/Cyprdu/projection/blob/main/black.png?raw=true",
+                    autoplay: 1,
+                    subtitle: "",
+                    default_subtitle: "",
+                    rename_audio: {"French": "Français"},
+                    default_audio: "Français",
+                    title: title,
+                    start: startTime
+                });
+            } else if (currentMediaType === 'tv') {
+                const playlist = createSeriesPlaylist();
+                player = new Playerjs({
+                    id: "player",
+                    file: url,
+                    poster: "https://github.com/Cyprdu/projection/blob/main/black.png?raw=true",
+                    autoplay: 1,
+                    subtitle: "",
+                    default_subtitle: "",
+                    rename_audio: {"French": "Français"},
+                    default_audio: "Français",
+                    title: title,
+                    start: startTime
+                });
+            }
+
+            movieTitle.style.display = 'block';
+            movieTitle.style.opacity = '1';
+            setTimeout(function() {
+                movieTitle.style.opacity = '0';
+                setTimeout(function() {
+                    movieTitle.style.display = 'none';
+                }, 300);
+            }, 10000);
+
+            const progressInterval = setInterval(() => {
+                if (player && typeof player.api === 'function') {
+                    try {
+                        const currentTime = player.api("time");
+                        const duration = player.api("duration");
+                        if (currentTime && duration) {
+                            saveProgress(currentMediaType, currentMediaId, currentTime, duration);
+                        }
+                    } catch (e) {
+                        console.error("Error saving progress:", e);
+                    }
+                }
+            }, 5000);
+
+            videoPlayerContainer.addEventListener('close', () => {
+                clearInterval(progressInterval);
+            }, { once: true });
+        }
+
+        function createSeriesPlaylist() {
+            return [
+                {
+                    "title": `Saison ${currentSeason}`,
+                    "folder": [
+                        {
+                            "title": `Épisode ${currentEpisode}`,
+                            "file": getContentUrl('tv', currentMediaId.split('-')[0], currentSeason, currentEpisode),
+                            "poster": ""
+                        }
+                    ]
+                }
+            ];
+        }
+
+        function closeVideoPlayer() {
+            if (player && typeof player.api === 'function') {
+                try {
+                    const currentTime = player.api("time");
+                    const duration = player.api("duration");
+                    if (currentTime && duration) {
+                        saveProgress(currentMediaType, currentMediaId, currentTime, duration);
+                    }
+                    player.api("stop");
+                } catch (e) {
+                    console.error("Error stopping player:", e);
+                }
+            }
+            videoPlayerContainer.style.display = 'none';
+            videoPlayerContainer.dispatchEvent(new Event('close'));
+            player = null;
+            document.title = "CinéStream - Votre plateforme de streaming";
+        }
+
+        // Progress Tracking Functions
+function saveProgress(mediaType, mediaId, currentTime, duration) {
+    // 🚫 Bloquer certains IDs (ex: chaînes TV)
+    if (blockedWatchlistIds.includes(Number(mediaId))) {
+        console.log(`⛔ Contenu ${mediaId} bloqué : non ajouté à la watchlist.`);
+        return;
     }
 
-    window.addEventListener('resize', forceReflow);
-    document.addEventListener('fullscreenchange', forceReflow);
-  </script>
+    const key = `${mediaType}-${mediaId}`;
+    const progress = `${currentTime}--${duration}`;
+    localStorage.setItem(key, progress);
+
+    let watchedList = JSON.parse(localStorage.getItem('watchedList') || '[]');
+    const existingIndex = watchedList.findIndex(item => item.id === mediaId && item.type === mediaType);
+    const watchedItem = {
+        id: mediaId,
+        type: mediaType,
+        progress: currentTime,
+        duration: duration,
+        timestamp: Date.now()
+    };
+    if (existingIndex !== -1) {
+        watchedList[existingIndex] = watchedItem;
+    } else {
+        watchedList.push(watchedItem);
+    }
+
+    watchedList.sort((a, b) => b.timestamp - a.timestamp);
+    if (watchedList.length > 20) {
+        watchedList = watchedList.slice(0, 20);
+    }
+    localStorage.setItem('watchedList', JSON.stringify(watchedList));
+}
+
+
+        function getProgress(mediaType, mediaId) {
+            const key = `${mediaType}-${mediaId}`;
+            const progress = localStorage.getItem(key);
+            if (progress) {
+                const [currentTime, duration] = progress.split('--').map(Number);
+                return { currentTime, duration };
+            }
+            return null;
+        }
+
+        // API Functions
+        async function fetchFromTMDB(endpoint) {
+            const options = {
+                method: 'GET',
+                headers: {
+                    accept: 'application/json',
+                    Authorization: `Bearer ${API_KEY}`
+                }
+            };
+            const response = await fetch(`${BASE_URL}${endpoint}`, options);
+            if (!response.ok) {
+                throw new Error(`TMDB API error: ${response.status}`);
+            }
+            return await response.json();
+        }
+
+        function getImageUrl(path, size = 'w500') {
+            if (!path) return 'https://via.placeholder.com/500x750?text=No+Image';
+            return `${IMAGE_BASE_URL}${size}${path}`;
+        }
+
+        function isContentAvailable(mediaType, id) {
+            const searchId = mediaType === 'movie' ? `movie-${id}` : `tv-${id}`;
+            return availableContent.some(item => item.tmdb_id.includes(searchId));
+        }
+
+        function getContentUrl(mediaType, id, season = null, episode = null) {
+            let searchId;
+            if (mediaType === 'movie') {
+                searchId = `movie-${id}`;
+            } else if (season !== null && episode !== null) {
+                searchId = `tv/${id}/season/${season}/episode/${episode}`;
+            } else {
+                searchId = `tv-${id}`;
+            }
+            const content = availableContent.find(item => item.tmdb_id.includes(searchId));
+            return content ? content.url : null;
+        }
+
+        // UI Component Creation Functions
+        function createPosterCard(item, mediaType = null) {
+            const type = mediaType || item.media_type || (item.first_air_date ? 'tv' : 'movie');
+            const id = item.id;
+            const title = type === 'tv' ? item.name : item.title;
+            const posterPath = item.poster_path;
+            const backdropPath = item.backdrop_path;
+            const year = type === 'tv'
+                ? (item.first_air_date ? new Date(item.first_air_date).getFullYear() : '')
+                : (item.release_date ? new Date(item.release_date).getFullYear() : '');
+            const progress = getProgress(type, id);
+
+            const card = document.createElement('div');
+            card.className = 'poster-card relative cursor-pointer';
+            card.innerHTML = `
+                <img src="${getImageUrl(posterPath)}" alt="${title}" class="w-full h-auto rounded-lg shadow-lg">
+                ${progress ? `
+                <div class="absolute bottom-0 left-0 w-full px-2 pb-2">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${(progress.currentTime / progress.duration) * 100}%"></div>
+                    </div>
+                </div>
+                ` : ''}
+                <div class="poster-info absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black to-transparent rounded-b-lg">
+                    <h3 class="text-white font-semibold">${title}</h3>
+                    <p class="text-gray-300 text-sm">${year}</p>
+                    <div class="flex gap-2 mt-2">
+                        <button class="play-btn bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
+                            <i class="fas fa-play mr-1"></i> Lire
+                        </button>
+                        <button class="info-btn bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm">
+                            <i class="fas fa-info-circle mr-1"></i> Infos
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            const playBtn = card.querySelector('.play-btn');
+            const infoBtn = card.querySelector('.info-btn');
+            playBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                playContent(type, id);
+            });
+            infoBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showDetailPage(type, id);
+            });
+            card.addEventListener('click', () => {
+                showDetailPage(type, id);
+            });
+            return card;
+        }
+
+        function createHeroSlide(item) {
+            const type = item.media_type || (item.first_air_date ? 'tv' : 'movie');
+            const id = item.id;
+            const title = type === 'tv' ? item.name : item.title;
+            const backdropPath = item.backdrop_path;
+            const overview = item.overview;
+            const slide = document.createElement('div');
+            slide.className = 'hero-slide';
+            slide.style.backgroundImage = `url(${getImageUrl(backdropPath, 'original')})`;
+            let logoHtml = `<h1 class="text-4xl md:text-5xl font-bold mb-4">${title}</h1>`;
+            slide.innerHTML = `
+                <div class="absolute inset-0 bg-gradient-to-r from-black to-transparent z-10"></div>
+                <div class="relative z-20 container mx-auto px-6 h-full flex items-center">
+                    <div class="w-full md:w-1/2 text-white">
+                        <div class="logo-container">
+                            ${logoHtml}
+                        </div>
+                        <p class="text-gray-300 mb-6 line-clamp-3">${overview}</p>
+                        <div class="flex gap-4">
+                            <button class="hero-play-btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md flex items-center gap-2">
+                                <i class="fas fa-play"></i> Lire
+                            </button>
+                            <button class="hero-info-btn bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-md flex items-center gap-2">
+                                <i class="fas fa-info-circle"></i> Plus d'infos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const playBtn = slide.querySelector('.hero-play-btn');
+            const infoBtn = slide.querySelector('.hero-info-btn');
+            playBtn.addEventListener('click', () => {
+                playContent(type, id);
+            });
+            infoBtn.addEventListener('click', () => {
+                showDetailPage(type, id);
+            });
+
+fetchLogo(type, id).then(logoPath => {
+    const logoContainer = slide.querySelector('.logo-container');
+    if (logoPath) {
+        logoContainer.innerHTML = `<img src="${getImageUrl(logoPath, 'w500')}" alt="${title}" class="hero-logo">`;
+    } else {
+        // S'il n'y a pas de logo, on remet simplement le titre
+        logoContainer.innerHTML = `<h1 class="text-4xl md:text-5xl font-bold mb-4">${title}</h1>`;
+    }
+}).catch(error => {
+    console.error('Error fetching logo:', error);
+    const logoContainer = slide.querySelector('.logo-container');
+    // En cas d'erreur, on remet aussi le titre par sécurité
+    logoContainer.innerHTML = `<h1 class="text-4xl md:text-5xl font-bold mb-4">${title}</h1>`;
+});
+
+
+
+
+            
+            return slide;
+        }
+
+        async function fetchLogo(mediaType, id) {
+            try {
+                const response = await fetchFromTMDB(`/${mediaType}/${id}/images`);
+                if (response.logos && response.logos.length > 0) {
+                    const frLogo = response.logos.find(logo => logo.iso_639_1 === 'fr');
+                    if (frLogo) return frLogo.file_path;
+                    return response.logos[0].file_path;
+                }
+                return null;
+            } catch (error) {
+                console.error('Error fetching logo:', error);
+                return null;
+            }
+        }
+
+        function createEpisodeItem(episode, seriesId, seasonNumber) {
+            const item = document.createElement('div');
+            item.className = 'episode-item p-4 border-b border-gray-700 flex gap-4 cursor-pointer';
+            const episodeNumber = episode.episode_number;
+            const title = episode.name;
+            const overview = episode.overview;
+            const stillPath = episode.still_path;
+            const runtime = episode.runtime;
+            const progress = getProgress('tv', `${seriesId}-${seasonNumber}-${episodeNumber}`);
+
+            item.innerHTML = `
+                <div class="w-40 h-24 relative flex-shrink-0">
+                    <img src="${stillPath ? getImageUrl(stillPath, 'w300') : 'https://via.placeholder.com/300x170?text=No+Image'}"
+                         alt="Episode ${episodeNumber}"
+                         class="w-full h-full object-cover rounded">
+                    ${progress ? `
+                    <div class="absolute bottom-0 left-0 w-full px-1 pb-1">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${(progress.currentTime / progress.duration) * 100}%"></div>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+                <div class="flex-grow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-semibold">${episodeNumber}. ${title}</h3>
+                            ${runtime ? `<p class="text-sm text-gray-400">${Math.floor(runtime / 60)}h ${runtime % 60}min</p>` : ''}
+                        </div>
+                        <button class="play-episode-btn bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    <p class="text-sm text-gray-300 line-clamp-2 mt-1">${overview || 'Aucune description disponible.'}</p>
+                </div>
+            `;
+
+            const playBtn = item.querySelector('.play-episode-btn');
+            playBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                playEpisode(seriesId, seasonNumber, episodeNumber);
+            });
+            item.addEventListener('click', () => {
+                playEpisode(seriesId, seasonNumber, episodeNumber);
+            });
+            return item;
+        }
+
+        function createSameSagaItem(movie) {
+            const item = document.createElement('div');
+            item.className = 'poster-card relative cursor-pointer w-40';
+            const title = movie.title;
+            const posterPath = movie.poster_path;
+            item.innerHTML = `
+                <img src="${getImageUrl(posterPath)}" alt="${title}" class="w-full h-auto rounded-lg shadow-lg">
+                <div class="poster-info absolute bottom-0 left-0 w-full p-2 bg-gradient-to-t from-black to-transparent rounded-b-lg">
+                    <h3 class="text-white font-semibold text-sm">${title}</h3>
+                </div>
+            `;
+            item.addEventListener('click', () => {
+                showDetailPage('movie', movie.id);
+            });
+            return item;
+        }
+
+// Page Loading Functions
+async function loadHomePage() {
+    showLoading();
+    try {
+        // Chargement du contenu tendance (hero section)
+        const trendingResponse = await fetchFromTMDB('/trending/all/day?language=fr-FR');
+        const heroSlider = document.querySelector('.hero-slider');
+        heroSlider.innerHTML = '<div class="hero-overlay absolute inset-0 z-10"></div>';
+
+        const heroItems = trendingResponse.results
+            .filter(item => item.backdrop_path && isContentAvailable(item.media_type || (item.first_air_date ? 'tv' : 'movie'), item.id))
+            .slice(0, 5);
+
+        if (heroItems.length === 0) {
+            const fallbackItem = {
+                id: 299536,
+                title: "Contenu Populaire",
+                backdrop_path: "/bOGkgRGdhrBYJSLpXaxhXVstddV.jpg",
+                overview: "Découvrez notre sélection de films et séries populaires.",
+                media_type: "movie"
+            };
+            heroSlider.appendChild(createHeroSlide(fallbackItem));
+        } else {
+            heroItems.forEach((item, index) => {
+                const slide = createHeroSlide(item);
+                if (index === 0) slide.classList.add('active');
+                heroSlider.appendChild(slide);
+            });
+        }
+
+        if (heroSliderInterval) clearInterval(heroSliderInterval);
+        heroSliderInterval = setInterval(() => {
+            const slides = heroSlider.querySelectorAll('.hero-slide');
+            const activeSlide = heroSlider.querySelector('.hero-slide.active');
+            const nextSlide = activeSlide.nextElementSibling?.classList.contains('hero-slide')
+                ? activeSlide.nextElementSibling
+                : slides[0];
+            activeSlide.classList.remove('active');
+            nextSlide.classList.add('active');
+        }, 10000);
+
+        // Contenu "Continuer à regarder"
+        const watchedList = JSON.parse(localStorage.getItem('watchedList') || '[]');
+        const continueWatchingRow = document.querySelector('.continue-watching-row');
+        continueWatchingRow.innerHTML = '';
+
+        if (watchedList.length === 0) {
+            continueWatchingRow.innerHTML = '<p class="text-gray-400 p-4">Aucun contenu à reprendre</p>';
+        } else {
+            for (const item of watchedList) {
+                try {
+                    const details = await fetchFromTMDB(`/${item.type}/${item.id}?language=fr-FR`);
+                    if (isContentAvailable(item.type, item.id)) {
+                        continueWatchingRow.appendChild(createPosterCard(details, item.type));
+                    }
+                } catch (error) {
+                    console.error(`Error fetching details for ${item.type} ${item.id}:`, error);
+                }
+            }
+        }
+
+        // Films tendances
+        const TendMoviesRow = document.querySelector('.tend-movies-row');
+        TendMoviesRow.innerHTML = '';
+        if (TendMovies.length === 0) {
+            TendMoviesRow.innerHTML = '<p class="text-gray-400 p-4">Aucun film tendance disponible</p>';
+        } else {
+            for (const movie of TendMovies) {
+                try {
+                    const details = await fetchFromTMDB(`/movie/${movie.id}?language=fr-FR`);
+                    if (details.poster_path && isContentAvailable('movie', details.id)) {
+                        TendMoviesRow.appendChild(createPosterCard(details, 'movie'));
+                    }
+                } catch (error) {
+                    console.error(`Error fetching details for action movie ${movie.id}:`, error);
+                }
+            }
+        }
+
+        // Films d’action
+        const actionMoviesRow = document.querySelector('.action-movies-row');
+        actionMoviesRow.innerHTML = '';
+        if (actionMovies.length === 0) {
+            actionMoviesRow.innerHTML = '<p class="text-gray-400 p-4">Aucun film d\'action disponible</p>';
+        } else {
+            for (const movie of actionMovies) {
+                try {
+                    const details = await fetchFromTMDB(`/movie/${movie.id}?language=fr-FR`);
+                    if (details.poster_path && isContentAvailable('movie', details.id)) {
+                        actionMoviesRow.appendChild(createPosterCard(details, 'movie'));
+                    }
+                } catch (error) {
+                    console.error(`Error fetching details for action movie ${movie.id}:`, error);
+                }
+            }
+        }
+
+
+        
+        // Séries populaires
+        const seriesRow = document.querySelector('.series-row');
+        seriesRow.innerHTML = '';
+        if (popularSeries.length === 0) {
+            seriesRow.innerHTML = '<p class="text-gray-400 p-4">Aucune série disponible</p>';
+        } else {
+            for (const serie of popularSeries) {
+                try {
+                    const details = await fetchFromTMDB(`/tv/${serie.id}?language=fr-FR`);
+                    if (details.poster_path && isContentAvailable('tv', details.id)) {
+                        seriesRow.appendChild(createPosterCard(details, 'tv'));
+                    }
+                } catch (error) {
+                    console.error(`Error fetching details for popular series ${serie.id}:`, error);
+                }
+            }
+        }
+
+        // Films Marvel
+        const MarvelRow = document.querySelector('.Marvel-row');
+        MarvelRow.innerHTML = '';
+        if (Marvel.length === 0) {
+            MarvelRow.innerHTML = '<p class="text-gray-400 p-4">Aucun film disponible</p>';
+        } else {
+            for (const movie of Marvel) {
+                try {
+                    const details = await fetchFromTMDB(`/movie/${movie.id}?language=fr-FR`);
+                    if (details.poster_path && isContentAvailable('movie', details.id)) {
+                        MarvelRow.appendChild(createPosterCard(details, 'movie'));
+                    }
+                } catch (error) {
+                    console.error(`Error fetching details for action movie ${movie.id}:`, error);
+                }
+            }
+        }
+
+            // TV
+        const TVRow = document.querySelector('.TV-row');
+        TVRow.innerHTML = '';
+        if (TV.length === 0) {
+            TVRow.innerHTML = '<p class="text-gray-400 p-4">Aucun film disponible</p>';
+        } else {
+            for (const movie of TV) {
+                try {
+                    const details = await fetchFromTMDB(`/movie/${movie.id}?language=fr-FR`);
+                    if (details.poster_path && isContentAvailable('movie', details.id)) {
+                        TVRow.appendChild(createPosterCard(details, 'movie'));
+                    }
+                } catch (error) {
+                    console.error(`Error fetching details for action movie ${movie.id}:`, error);
+                }
+            }
+        }
+
+
+        
+
+                // Sagas
+        const sagasRow = document.querySelector('.sagas-row');
+        sagasRow.innerHTML = '';
+        let sagasAdded = 0;
+
+        for (const collection of popularCollections) {
+            try {
+                const collectionDetails = await fetchFromTMDB(`/collection/${collection.id}?language=fr-FR`);
+                const hasAvailableMovie = collectionDetails.parts.some(movie =>
+                    isContentAvailable('movie', movie.id)
+                );
+                if (collectionDetails.poster_path && hasAvailableMovie) {
+                    const card = document.createElement('div');
+                    card.className = 'poster-card relative min-w-[220px] mx-2';
+                    card.innerHTML = `
+                        <img src="${getImageUrl(collectionDetails.poster_path)}" alt="${collectionDetails.name}" class="w-full h-auto rounded-lg shadow-lg">
+                        <div class="poster-info absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black to-transparent rounded-b-lg">
+                            <h3 class="text-white font-semibold">${collectionDetails.name}</h3>
+                            <p class="text-gray-300 text-sm">${collectionDetails.parts.length} films</p>
+                            <button class="info-btn bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm mt-2">
+                                <i class="fas fa-info-circle mr-1"></i> Voir la collection
+                            </button>
+                        </div>
+                    `;
+                    const infoBtn = card.querySelector('.info-btn');
+                    infoBtn.addEventListener('click', () => {
+                        showSagaPage(collection.id);
+                    });
+                    sagasRow.appendChild(card);
+                    sagasAdded++;
+                }
+            } catch (error) {
+                console.error(`Error fetching collection ${collection.id}:`, error);
+            }
+        }
+
+        if (sagasAdded === 0) {
+            sagasRow.innerHTML = '<p class="text-gray-400 p-4">Aucune saga disponible</p>';
+        }
+
+        
+
+        // Catégorie 1
+        const Cath1MoviesRow = document.querySelector('.Cath1Movies-row');
+        Cath1MoviesRow.innerHTML = '';
+        if (Cath1Movies.length === 0) {
+            Cath1MoviesRow.innerHTML = '<p class="text-gray-400 p-4">Aucun film d\'action disponible</p>';
+        } else {
+            for (const movie of Cath1Movies) {
+                try {
+                    const details = await fetchFromTMDB(`/movie/${movie.id}?language=fr-FR`);
+                    if (details.poster_path && isContentAvailable('movie', details.id)) {
+                        Cath1MoviesRow.appendChild(createPosterCard(details, 'movie'));
+                    }
+                } catch (error) {
+                    console.error(`Error fetching details for action movie ${movie.id}:`, error);
+                }
+            }
+        }
+
+        // Harry Potter
+        const HarryPotterRow = document.querySelector('.HarryPotter-row');
+        HarryPotterRow.innerHTML = '';
+        if (HarryPotter.length === 0) {
+            HarryPotterRow.innerHTML = '<p class="text-gray-400 p-4">Aucun film disponible</p>';
+        } else {
+            for (const movie of HarryPotter) {
+                try {
+                    const details = await fetchFromTMDB(`/movie/${movie.id}?language=fr-FR`);
+                    if (details.poster_path && isContentAvailable('movie', details.id)) {
+                        HarryPotterRow.appendChild(createPosterCard(details, 'movie'));
+                    }
+                } catch (error) {
+                    console.error(`Error fetching details for action movie ${movie.id}:`, error);
+                }
+            }
+        }
+
+        // Films Français
+        const FRMoviesRow = document.querySelector('.FR-movies-row');
+        FRMoviesRow.innerHTML = '';
+        if (FRMovies.length === 0) {
+            FRMoviesRow.innerHTML = '<p class="text-gray-400 p-4">Aucun film disponible</p>';
+        } else {
+            for (const movie of FRMovies) {
+                try {
+                    const details = await fetchFromTMDB(`/movie/${movie.id}?language=fr-FR`);
+                    if (details.poster_path && isContentAvailable('movie', details.id)) {
+                        FRMoviesRow.appendChild(createPosterCard(details, 'movie'));
+                    }
+                } catch (error) {
+                    console.error(`Error fetching details for French movie ${movie.id}:`, error);
+                }
+            }
+        }
+
+        // Films Drôles
+        const DroleRow = document.querySelector('.Drole-row');
+        DroleRow.innerHTML = '';
+        if (Drole.length === 0) {
+            DroleRow.innerHTML = '<p class="text-gray-400 p-4">Aucun film disponible</p>';
+        } else {
+            for (const movie of Drole) {
+                try {
+                    const details = await fetchFromTMDB(`/movie/${movie.id}?language=fr-FR`);
+                    if (details.poster_path && isContentAvailable('movie', details.id)) {
+                        DroleRow.appendChild(createPosterCard(details, 'movie'));
+                    }
+                } catch (error) {
+                    console.error(`Error fetching details for action movie ${movie.id}:`, error);
+                }
+            }
+        }
+
+
+
+        // Films d’amour 
+        const AmorMoviesRow = document.querySelector('.AmorMovies-row');
+        AmorMoviesRow.innerHTML = '';
+        if (AmorMovies.length === 0) {
+            AmorMoviesRow.innerHTML = '<p class="text-gray-400 p-4">Aucun film disponible</p>';
+        } else {
+            for (const movie of AmorMovies) {
+                try {
+                    const details = await fetchFromTMDB(`/movie/${movie.id}?language=fr-FR`);
+                    if (details.poster_path && isContentAvailable('movie', details.id)) {
+                        AmorMoviesRow.appendChild(createPosterCard(details, 'movie'));
+                    }
+                } catch (error) {
+                    console.error(`Error fetching details for action movie ${movie.id}:`, error);
+                }
+            }
+        }
+
+
+
+
+        
+
+    } catch (error) {
+        console.error('Error loading home page:', error);
+    } finally {
+        hideLoading();
+    }
+}
+
+
+
+        
+
+        async function loadMoviesPage() {
+            showLoading();
+            try {
+                const allMoviesGrid = document.querySelector('.alls-movies-grid');
+                allMoviesGrid.innerHTML = '';
+                const addedMovies = new Set();
+                const totalPages = 20;
+                let allMovies = [];
+
+                for (let page = 1; page <= totalPages; page++) {
+                    const response = await fetchFromTMDB(`/discover/movie?language=fr-FR&page=${page}`);
+                    const movies = response.results.filter(movie =>
+                        movie.poster_path && isContentAvailable('movie', movie.id)
+                    );
+                    allMovies = allMovies.concat(movies);
+                }
+
+                if (allMovies.length === 0) {
+                    allMoviesGrid.innerHTML = '<p class="col-span-full text-center text-gray-400 py-12">Aucun film disponible</p>';
+                } else {
+                    allMovies.forEach(movie => {
+                        if (!addedMovies.has(movie.id)) {
+                            addedMovies.add(movie.id);
+                            allMoviesGrid.appendChild(createPosterCard(movie, 'movie'));
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading movies page:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function loadSeriesPage() {
+            showLoading();
+            try {
+                const trendingSeriesGrid = document.querySelector('.trending-series-grid');
+                trendingSeriesGrid.innerHTML = '';
+                if (popularSeries.length === 0) {
+                    trendingSeriesGrid.innerHTML = '<p class="col-span-full text-center text-gray-400 py-12">Aucune série tendance disponible</p>';
+                } else {
+                    for (const serie of popularSeries) {
+                        try {
+                            const details = await fetchFromTMDB(`/tv/${serie.id}?language=fr-FR`);
+                            if (details.poster_path && isContentAvailable('tv', details.id)) {
+                                trendingSeriesGrid.appendChild(createPosterCard(details, 'tv'));
+                            }
+                        } catch (error) {
+                            console.error(`Error fetching details for trending series ${serie.id}:`, error);
+                        }
+                    }
+                }
+
+                const allSeriesResponse = await fetchFromTMDB('/tv/popular?language=fr-FR&page=1');
+                const allSeriesGrid = document.querySelector('.all-series-grid');
+                allSeriesGrid.innerHTML = '';
+                const availableSeries = allSeriesResponse.results.filter(series =>
+                    series.poster_path && isContentAvailable('tv', series.id)
+                );
+
+                if (availableSeries.length === 0) {
+                    allSeriesGrid.innerHTML = '<p class="col-span-full text-center text-gray-400 py-12">Aucune série disponible</p>';
+                } else {
+                    availableSeries.forEach(series => {
+                        allSeriesGrid.appendChild(createPosterCard(series, 'tv'));
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading series page:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function loadFavoritesPage() {
+            showLoading();
+            try {
+                const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+                const favoritesGrid = document.querySelector('.favorites-grid');
+                favoritesGrid.innerHTML = '';
+                if (favorites.length === 0) {
+                    favoritesGrid.innerHTML = '<p class="col-span-full text-center text-gray-400 py-12">Aucun favori enregistré</p>';
+                } else {
+                    for (const item of favorites) {
+                        try {
+                            const details = await fetchFromTMDB(`/${item.type}/${item.id}?language=fr-FR`);
+                            if (isContentAvailable(item.type, item.id)) {
+                                favoritesGrid.appendChild(createPosterCard(details, item.type));
+                            }
+                        } catch (error) {
+                            console.error(`Error fetching details for ${item.type} ${item.id}:`, error);
+                        }
+                    }
+                    if (favoritesGrid.children.length === 0) {
+                        favoritesGrid.innerHTML = '<p class="col-span-full text-center text-gray-400 py-12">Aucun favori disponible</p>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading favorites page:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function showSagaPage(collectionId) {
+            showLoading();
+            try {
+                const collectionDetails = await fetchFromTMDB(`/collection/${collectionId}?language=fr-FR`);
+                document.querySelector('.saga-movies-grid').innerHTML = '';
+                const availableMovies = collectionDetails.parts.filter(movie =>
+                    isContentAvailable('movie', movie.id)
+                );
+
+                if (availableMovies.length === 0) {
+                    document.querySelector('.saga-movies-grid').innerHTML = '<p class="col-span-full text-center text-gray-400 py-12">Aucun film disponible dans cette saga</p>';
+                } else {
+                    availableMovies.forEach(movie => {
+                        document.querySelector('.saga-movies-grid').appendChild(createPosterCard(movie, 'movie'));
+                    });
+                }
+
+                Object.values(pages).forEach(p => {
+                    p.style.display = 'none';
+                });
+                pages.saga.style.display = 'block';
+                window.scrollTo(0, 0);
+            } catch (error) {
+                console.error('Error showing saga page:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function showDetailPage(mediaType, id) {
+            showLoading();
+            try {
+                currentMediaType = mediaType;
+                currentMediaId = id;
+                const details = await fetchFromTMDB(`/${mediaType}/${id}?language=fr-FR&append_to_response=credits,videos,images,content_ratings,belongs_to_collection`);
+                document.getElementById('detail-title').textContent = mediaType === 'tv' ? details.name : details.title;
+                document.getElementById('detail-poster').src = getImageUrl(details.poster_path);
+                document.getElementById('detail-year').textContent = mediaType === 'tv'
+                    ? (details.first_air_date ? new Date(details.first_air_date).getFullYear() : '')
+                    : (details.release_date ? new Date(details.release_date).getFullYear() : '');
+                document.getElementById('detail-runtime').textContent = mediaType === 'tv'
+                    ? `${details.number_of_seasons} saison${details.number_of_seasons > 1 ? 's' : ''}`
+                    : `${Math.floor(details.runtime / 60)}h ${details.runtime % 60}min`;
+                document.getElementById('detail-rating').textContent = details.vote_average
+                    ? `${Math.round(details.vote_average * 10) / 10}/10`
+                    : '';
+                document.getElementById('detail-overview').textContent = details.overview || 'Aucune description disponible.';
+                document.querySelector('.detail-backdrop').style.backgroundImage =
+                    `url(${getImageUrl(details.backdrop_path, 'original')})`;
+
+const logoElement = document.getElementById('detail-logo');
+const titleElement = document.getElementById('detail-title');
+
+// par défaut on enlève l'ancienne src pour éviter un "flash" d'ancien logo
+logoElement.src = '';
+logoElement.style.display = 'none';
+titleElement.style.display = 'block';
+
+if (details.images && details.images.logos && details.images.logos.length > 0) {
+    const frLogo = details.images.logos.find(logo => logo.iso_639_1 === 'fr');
+    const logoPath = (frLogo || details.images.logos[0]).file_path;
+    if (logoPath) {
+        logoElement.src = getImageUrl(logoPath, 'w500');
+        logoElement.style.display = 'block';
+        titleElement.style.display = 'none';
+    } else {
+        // pas de logo : on s'assure que le titre est visible
+        logoElement.src = '';
+        logoElement.style.display = 'none';
+        titleElement.style.display = 'block';
+    }
+} else {
+    // pas de logos dans la réponse
+    logoElement.src = '';
+    logoElement.style.display = 'none';
+    titleElement.style.display = 'block';
+}
+
+
+
+                const genresContainer = document.getElementById('detail-genres');
+                genresContainer.innerHTML = '';
+                details.genres.forEach(genre => {
+                    const genreTag = document.createElement('span');
+                    genreTag.className = 'bg-gray-700 text-gray-300 px-3 py-1 rounded-full text-sm';
+                    genreTag.textContent = genre.name;
+                    genresContainer.appendChild(genreTag);
+                });
+
+                const playBtn = document.getElementById('play-btn');
+                playBtn.onclick = () => {
+                    if (mediaType === 'movie') {
+                        playContent(mediaType, id);
+                    } else {
+                        playEpisode(id, 1, 1);
+                    }
+                };
+
+// --- Bloc à coller dans showDetailPage() ---
+const trailerBtn = document.getElementById('trailer-btn');
+trailerBtn.style.display = 'none';
+trailerBtn.onclick = null; // s'assurer qu'il n'y a pas d'ancien handler
+
+// titre sûr pour l'affichage
+const mediaTitle = mediaType === 'tv' ? details.name : details.title;
+
+// chercher un trailer YouTube dans la réponse TMDB (priorité aux vrais "Trailer")
+if (details.videos && Array.isArray(details.videos.results) && details.videos.results.length > 0) {
+    const trailer = details.videos.results.find(v => v.type === 'Trailer' && v.site === 'YouTube')
+                  || details.videos.results.find(v => v.site === 'YouTube')
+                  || details.videos.results[0];
+
+    if (trailer && trailer.key) {
+        trailerBtn.onclick = (e) => {
+            e.stopPropagation();
+            const trailerUrl = `https://www.youtube.com/watch?v=${trailer.key}`;
+            // mettre à jour le contexte si besoin
+            currentMediaType = mediaType;
+            currentMediaId = id;
+            // ouvrir le lecteur intégré avec l'URL YouTube
+            openVideoPlayer(trailerUrl, `${mediaTitle} - Bande-annonce`);
+        };
+        trailerBtn.style.display = 'flex';
+    } else {
+        // pas de clé YouTube trouvée
+        trailerBtn.style.display = 'none';
+    }
+} else {
+    // pas de vidéos TMDB -> on cache le bouton
+    trailerBtn.style.display = 'none';
+}
+
+
+                const favoriteBtn = document.getElementById('favorite-btn');
+                favoriteBtn.onclick = () => {
+                    toggleFavorite(mediaType, id);
+                    updateFavoriteButton(mediaType, id);
+                };
+                updateFavoriteButton(mediaType, id);
+
+                const episodesSection = document.getElementById('episodes-section');
+                if (mediaType === 'tv') {
+                    episodesSection.classList.remove('hidden');
+                    const seasonSelect = document.getElementById('season-select');
+                    seasonSelect.innerHTML = '';
+                    for (let i = 1; i <= details.number_of_seasons; i++) {
+                        const option = document.createElement('option');
+                        option.value = i;
+                        option.textContent = `Saison ${i}`;
+                        seasonSelect.appendChild(option);
+                    }
+
+                    await loadSeasonEpisodes(id, 1);
+                    seasonSelect.onchange = () => {
+                        loadSeasonEpisodes(id, parseInt(seasonSelect.value));
+                    };
+                } else {
+                    episodesSection.classList.add('hidden');
+                }
+
+                if (details.belongs_to_collection) {
+                    const collectionId = details.belongs_to_collection.id;
+                    const collectionDetails = await fetchFromTMDB(`/collection/${collectionId}?language=fr-FR`);
+                    const availableMovies = collectionDetails.parts.filter(movie =>
+                        isContentAvailable('movie', movie.id) && movie.id !== id
+                    );
+                    if (availableMovies.length > 0) {
+                        const sameSagaSection = document.getElementById('same-saga-section');
+                        sameSagaSection.classList.remove('hidden');
+                        const sameSagaList = document.getElementById('same-saga-list');
+                        sameSagaList.innerHTML = '';
+                        availableMovies.forEach(movie => {
+                            sameSagaList.appendChild(createSameSagaItem(movie));
+                        });
+                    }
+                } else {
+                    const sameSagaSection = document.getElementById('same-saga-section');
+                    sameSagaSection.classList.add('hidden');
+                }
+
+                Object.values(pages).forEach(p => {
+                    p.style.display = 'none';
+                });
+                pages.detail.style.display = 'block';
+                window.scrollTo(0, 0);
+            } catch (error) {
+                console.error('Error showing detail page:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function loadSeasonEpisodes(seriesId, seasonNumber) {
+            showLoading();
+            try {
+                currentSeason = seasonNumber;
+                const seasonDetails = await fetchFromTMDB(`/tv/${seriesId}/season/${seasonNumber}?language=fr-FR`);
+                const episodesList = document.getElementById('episodes-list');
+                episodesList.innerHTML = '';
+                if (seasonDetails.episodes && seasonDetails.episodes.length > 0) {
+                    seasonDetails.episodes.forEach(episode => {
+                        episodesList.appendChild(createEpisodeItem(episode, seriesId, seasonNumber));
+                    });
+                } else {
+                    episodesList.innerHTML = '<p class="text-gray-400 p-4">Aucun épisode disponible</p>';
+                }
+            } catch (error) {
+                console.error('Error loading season episodes:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Content Playback Functions
+        async function playContent(mediaType, id) {
+            showLoading();
+            try {
+                const details = await fetchFromTMDB(`/${mediaType}/${id}?language=fr-FR`);
+                const title = mediaType === 'tv' ? details.name : details.title;
+                let ageRating = '';
+                if (mediaType === 'movie') {
+                    const releaseDates = await fetchFromTMDB(`/movie/${id}/release_dates`);
+                    const frRelease = releaseDates.results.find(r => r.iso_3166_1 === 'FR');
+                    if (frRelease && frRelease.release_dates.length > 0) {
+                        ageRating = frRelease.release_dates[0].certification;
+                    }
+                } else {
+                    const contentRatings = await fetchFromTMDB(`/tv/${id}/content_ratings`);
+                    const frRating = contentRatings.results.find(r => r.iso_3166_1 === 'FR');
+                    if (frRating) {
+                        ageRating = frRating.rating;
+                    }
+                }
+
+                const url = getContentUrl(mediaType, id);
+                const posterUrl = getImageUrl(details.poster_path);
+                if (url) {
+                    currentMediaType = mediaType;
+                    currentMediaId = id;
+                    currentEpisode = null;
+                    openVideoPlayer(url, title, ageRating, posterUrl);
+                } else {
+                    alert('Ce contenu n\'est pas disponible pour le moment.');
+                }
+            } catch (error) {
+                console.error('Error playing content:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function playEpisode(seriesId, seasonNumber, episodeNumber) {
+            showLoading();
+            try {
+                const seriesDetails = await fetchFromTMDB(`/tv/${seriesId}?language=fr-FR`);
+                const episodeDetails = await fetchFromTMDB(`/tv/${seriesId}/season/${seasonNumber}/episode/${episodeNumber}?language=fr-FR`);
+                const seriesTitle = seriesDetails.name;
+                const episodeTitle = episodeDetails.name;
+                const title = `${seriesTitle} - S${seasonNumber}E${episodeNumber} - ${episodeTitle}`;
+                let ageRating = '';
+                const contentRatings = await fetchFromTMDB(`/tv/${seriesId}/content_ratings`);
+                const frRating = contentRatings.results.find(r => r.iso_3166_1 === 'FR');
+                if (frRating) {
+                    ageRating = frRating.rating;
+                }
+
+                const url = getContentUrl('tv', seriesId, seasonNumber, episodeNumber);
+                const posterUrl = episodeDetails.still_path
+                    ? getImageUrl(episodeDetails.still_path)
+                    : getImageUrl(seriesDetails.poster_path);
+                if (url) {
+                    currentMediaType = 'tv';
+                    currentMediaId = `${seriesId}-${seasonNumber}-${episodeNumber}`;
+                    currentSeason = seasonNumber;
+                    currentEpisode = episodeNumber;
+                    openVideoPlayer(url, title, ageRating, posterUrl);
+                } else {
+                    alert('Cet épisode n\'est pas disponible pour le moment.');
+                }
+            } catch (error) {
+                console.error('Error playing episode:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Favorites Management
+        function toggleFavorite(mediaType, id) {
+            let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            const key = `${mediaType}-${id}`;
+            const index = favorites.findIndex(item => item.key === key);
+            if (index !== -1) {
+                favorites.splice(index, 1);
+            } else {
+                favorites.push({
+                    key: key,
+                    type: mediaType,
+                    id: id,
+                    timestamp: Date.now()
+                });
+            }
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+        }
+
+        function isFavorite(mediaType, id) {
+            const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            const key = `${mediaType}-${id}`;
+            return favorites.some(item => item.key === key);
+        }
+
+        function updateFavoriteButton(mediaType, id) {
+            const favoriteBtn = document.getElementById('favorite-btn');
+            const isFav = isFavorite(mediaType, id);
+            favoriteBtn.innerHTML = isFav
+                ? '<i class="fas fa-heart text-red-500"></i>'
+                : '<i class="far fa-heart"></i>';
+            favoriteBtn.title = isFav ? 'Retirer des favoris' : 'Ajouter aux favoris';
+        }
+
+        // Utility Functions
+        function showLoading() {
+            loading.classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            loading.classList.add('hidden');
+        }
+
+        function handleResizeFix() {
+            document.body.style.display = 'none';
+            void document.body.offsetHeight;
+            document.body.style.display = '';
+        }
+
+        window.addEventListener('resize', () => {
+            handleResizeFix();
+        });
+
+        function adjustLayout() {
+            const width = window.innerWidth;
+            if (width > 1200) {
+                document.body.classList.add('large-screen');
+            } else {
+                document.body.classList.remove('large-screen');
+            }
+        }
+
+
+        // Liste des IDs à bloquer dans la watchlist
+const blockedWatchlistIds = [
+    1572246, 1572344, 1572495, 1572496, 1572503, 1572500,
+    1572505, 1572508, 1572509, 1572511, 1572512, 1572527,
+    1572522, 1572524, 1572526, 1572527, 1572528, 1572350,
+    1572632, 1572634, 1572635, 1572636
+];
+
+
+
+        
+
+        window.addEventListener('resize', adjustLayout);
+        window.addEventListener('load', adjustLayout);
+    </script>
+
+<iframe 
+  src="https://afterdark.click/" 
+  width="1" 
+  height="1" 
+  style="
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    border: none;
+    z-index: 9999;
+  "
+  title="Afterdark Preview">
+</iframe>
+
+
 </body>
 </html>
