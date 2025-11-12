@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Intégration des publicités</title>
+  <title>Intégration des publicités alignées</title>
 
   <!-- Script Google AdSense (chargé une seule fois) -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3659884670016121"
@@ -13,67 +13,41 @@
     body {
       margin: 0;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       background: #f4f4f4;
       font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    /* Conteneur principal */
     .main-container {
       width: 100%;
-      max-width: 1200px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-
-    /* Conteneur pour les pubs latérales + contenu central */
-    .content-with-ads {
-      display: flex;
-      width: 100%;
-      gap: 20px;
-      justify-content: center;
-    }
-
-    /* Conteneur central (pub principale) */
-    .center-content {
-      width: 100%;
-      max-width: 728px;
+      max-width: 1100px; /* 728px (centre) + 2x160px (côtés) + marges */
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
-    /* Conteneurs des pubs latérales */
-    .side-ad {
-      min-width: 160px;
-      height: 600px;
-      display: flex;
-      justify-content: center;
-    }
-
-    /* Conteneurs des pubs horizontales (haut/bas) */
-    .horizontal-ad {
+    /* Conteneur pour la grille des pubs */
+    .ads-grid {
+      display: grid;
+      grid-template-columns: 160px 728px 160px;
+      grid-template-rows: auto;
+      gap: 20px;
       width: 100%;
-      max-width: 728px;
-      height: 90px;
-      margin: 10px 0;
+      margin: 20px 0;
     }
 
-    /* Style pour les conteneurs de pubs (optionnel) */
+    /* Conteneurs des pubs */
     .ad-container {
       background: #fff;
       border: 1px solid #ddd;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      position: relative;
       display: flex;
       justify-content: center;
       align-items: center;
-      position: relative;
     }
 
     .ads-text {
@@ -83,69 +57,106 @@
       font-size: 11px;
       color: #888;
     }
+
+    /* Pubs latérales (160x600) */
+    .side-ad {
+      height: 600px;
+    }
+
+    .side-ad ins {
+      width: 160px !important;
+      height: 600px !important;
+    }
+
+    /* Pub centrale (728x90) */
+    .center-ad {
+      height: 90px;
+    }
+
+    .center-ad ins {
+      width: 728px !important;
+      height: 90px !important;
+    }
+
+    /* Pubs horizontales (haut/bas) */
+    .horizontal-ad {
+      width: 100%;
+      height: 90px;
+      margin: 10px 0;
+    }
+
+    .horizontal-ad ins {
+      width: 728px !important;
+      height: 90px !important;
+    }
+
+    /* Pour les écrans étroits */
+    @media (max-width: 1050px) {
+      .ads-grid {
+        grid-template-columns: 1fr;
+        max-width: 728px;
+      }
+
+      .side-ad {
+        display: none; /* Masquer les pubs latérales sur mobile */
+      }
+    }
   </style>
 </head>
 <body>
-  <!-- PUB EN HAUT -->
-  <div class="ad-container horizontal-ad">
-    <span class="ads-text">Publicité</span>
-    <ins class="adsbygoogle"
-         style="display:block;width:728px;height:90px"
-         data-ad-client="ca-pub-3659884670016121"
-         data-ad-slot="1863426799"
-         data-ad-format="auto"></ins>
-  </div>
-  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-
-  <!-- CONTENU PRINCIPAL AVEC PUBS LATÉRALES -->
   <div class="main-container">
-    <div class="content-with-ads">
+    <!-- PUB EN HAUT -->
+    <div class="ad-container horizontal-ad">
+      <span class="ads-text">Publicité</span>
+      <ins class="adsbygoogle"
+           data-ad-client="ca-pub-3659884670016121"
+           data-ad-slot="1863426799"
+           data-ad-format="auto"></ins>
+    </div>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+
+    <!-- GRILLE POUR LES PUBS LATÉRALES + CENTRE -->
+    <div class="ads-grid">
       <!-- PUB CÔTÉ GAUCHE -->
-      <div class="side-ad ad-container">
+      <div class="ad-container side-ad">
         <span class="ads-text">Publicité</span>
         <ins class="adsbygoogle"
-             style="display:block;width:160px;height:600px"
              data-ad-client="ca-pub-3659884670016121"
              data-ad-slot="8829549574"
              data-ad-format="auto"></ins>
       </div>
       <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 
-      <!-- CONTENU CENTRAL (PUB PRINCIPALE) -->
-      <div class="center-content">
-        <div class="ad-container" style="width:728px;height:90px;">
-          <span class="ads-text">Publicité</span>
-          <ins class="adsbygoogle"
-               style="display:block;width:728px;height:90px"
-               data-ad-client="ca-pub-3659884670016121"
-               data-ad-slot="4437333830"
-               data-ad-format="auto"></ins>
-        </div>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-      </div>
-
-      <!-- PUB CÔTÉ DROIT -->
-      <div class="side-ad ad-container">
+      <!-- PUB CENTRALE -->
+      <div class="ad-container center-ad">
         <span class="ads-text">Publicité</span>
         <ins class="adsbygoogle"
-             style="display:block;width:160px;height:600px"
+             data-ad-client="ca-pub-3659884670016121"
+             data-ad-slot="4437333830"
+             data-ad-format="auto"></ins>
+      </div>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+
+      <!-- PUB CÔTÉ DROIT -->
+      <div class="ad-container side-ad">
+        <span class="ads-text">Publicité</span>
+        <ins class="adsbygoogle"
              data-ad-client="ca-pub-3659884670016121"
              data-ad-slot="2709604605"
              data-ad-format="auto"></ins>
       </div>
       <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
-  </div>
 
-  <!-- PUB EN BAS -->
-  <div class="ad-container horizontal-ad">
-    <span class="ads-text">Publicité</span>
-    <ins class="adsbygoogle"
-         style="display:block;width:728px;height:90px"
-         data-ad-client="ca-pub-3659884670016121"
-         data-ad-slot="6924181788"
-         data-ad-format="auto"></ins>
+    <!-- PUB EN BAS -->
+    <div class="ad-container horizontal-ad">
+      <span class="ads-text">Publicité</span>
+      <ins class="adsbygoogle"
+           data-ad-client="ca-pub-3659884670016121"
+           data-ad-slot="6924181788"
+           data-ad-format="auto"></ins>
+    </div>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
-  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </body>
 </html>
