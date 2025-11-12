@@ -3,31 +3,76 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Test emplacement pub</title>
+  <title>Intégration des publicités</title>
 
-  <!-- Script Google AdSense -->
+  <!-- Script Google AdSense (chargé une seule fois) -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3659884670016121"
-     crossorigin="anonymous"></script>
+          crossorigin="anonymous"></script>
 
   <style>
     body {
       margin: 0;
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
       background: #f4f4f4;
+      font-family: Arial, sans-serif;
     }
 
-    .containerAds {
-      width: 728px;
+    /* Conteneur principal */
+    .main-container {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    /* Conteneur pour les pubs latérales + contenu central */
+    .content-with-ads {
+      display: flex;
+      width: 100%;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    /* Conteneur central (pub principale) */
+    .center-content {
+      width: 100%;
+      max-width: 728px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Conteneurs des pubs latérales */
+    .side-ad {
+      min-width: 160px;
+      height: 600px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Conteneurs des pubs horizontales (haut/bas) */
+    .horizontal-ad {
+      width: 100%;
+      max-width: 728px;
       height: 90px;
+      margin: 10px 0;
+    }
+
+    /* Style pour les conteneurs de pubs (optionnel) */
+    .ad-container {
       background: #fff;
       border: 1px solid #ddd;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       display: flex;
       justify-content: center;
       align-items: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       position: relative;
     }
 
@@ -37,27 +82,70 @@
       right: 8px;
       font-size: 11px;
       color: #888;
-      font-family: sans-serif;
     }
   </style>
 </head>
 <body>
-
-  <div class="containerAds">
+  <!-- PUB EN HAUT -->
+  <div class="ad-container horizontal-ad">
     <span class="ads-text">Publicité</span>
-
-    <!-- Espace pub avec le bon data-ad-slot -->
     <ins class="adsbygoogle"
          style="display:block;width:728px;height:90px"
          data-ad-client="ca-pub-3659884670016121"
-         data-ad-slot="4437333830"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
+         data-ad-slot="1863426799"
+         data-ad-format="auto"></ins>
+  </div>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+
+  <!-- CONTENU PRINCIPAL AVEC PUBS LATÉRALES -->
+  <div class="main-container">
+    <div class="content-with-ads">
+      <!-- PUB CÔTÉ GAUCHE -->
+      <div class="side-ad ad-container">
+        <span class="ads-text">Publicité</span>
+        <ins class="adsbygoogle"
+             style="display:block;width:160px;height:600px"
+             data-ad-client="ca-pub-3659884670016121"
+             data-ad-slot="8829549574"
+             data-ad-format="auto"></ins>
+      </div>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+
+      <!-- CONTENU CENTRAL (PUB PRINCIPALE) -->
+      <div class="center-content">
+        <div class="ad-container" style="width:728px;height:90px;">
+          <span class="ads-text">Publicité</span>
+          <ins class="adsbygoogle"
+               style="display:block;width:728px;height:90px"
+               data-ad-client="ca-pub-3659884670016121"
+               data-ad-slot="4437333830"
+               data-ad-format="auto"></ins>
+        </div>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+
+      <!-- PUB CÔTÉ DROIT -->
+      <div class="side-ad ad-container">
+        <span class="ads-text">Publicité</span>
+        <ins class="adsbygoogle"
+             style="display:block;width:160px;height:600px"
+             data-ad-client="ca-pub-3659884670016121"
+             data-ad-slot="2709604605"
+             data-ad-format="auto"></ins>
+      </div>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
   </div>
 
-  <script>
-    (adsbygoogle = window.adsbygoogle || []).push({});
-  </script>
-
+  <!-- PUB EN BAS -->
+  <div class="ad-container horizontal-ad">
+    <span class="ads-text">Publicité</span>
+    <ins class="adsbygoogle"
+         style="display:block;width:728px;height:90px"
+         data-ad-client="ca-pub-3659884670016121"
+         data-ad-slot="6924181788"
+         data-ad-format="auto"></ins>
+  </div>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </body>
 </html>
